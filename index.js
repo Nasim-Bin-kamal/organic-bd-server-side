@@ -19,7 +19,7 @@ app.use(express.json());
 const port = process.env.PORT || 5000;
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dfhki.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
-console.log(uri);
+
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
@@ -28,6 +28,7 @@ async function run() {
         await client.connect();
         const database = client.db('organicBdDb');
         const productsCollection = database.collection('products');
+        const featuredCollection = database.collection('featuredProducts');
 
 
 
@@ -36,6 +37,22 @@ async function run() {
             const cursor = productsCollection.find({});
             const products = await cursor.toArray();
             res.json(products);
+        });
+
+        //GET API for top products
+        app.get('/featuredProducts', async (req, res) => {
+            const cursor = featuredCollection.find({});
+            const products = await cursor.toArray();
+            res.json(products);
+        });
+
+
+        //POST API for add a product
+        app.post('/products', async (req, res) => {
+            const newProduct = req.body;
+            console.log(newProduct);
+            const result = await productsCollection.insertOne(newProduct);
+            res.json(result);
         });
 
 
