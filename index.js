@@ -29,7 +29,7 @@ async function run() {
         const database = client.db('organicBdDb');
         const productsCollection = database.collection('products');
         const featuredCollection = database.collection('featuredProducts');
-
+        const reviewCollection = database.collection('reviews');
 
 
         //GET API for all products
@@ -62,6 +62,20 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const result = await productsCollection.deleteOne(query);
             res.json(result);
+        });
+
+        //POST API for add review
+        app.post('/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.json(result);
+        })
+
+        //GET API for reviews
+        app.get('/reviews', async (req, res) => {
+            const cursor = reviewCollection.find({});
+            const reviews = await cursor.toArray();
+            res.json(reviews);
         });
 
 
